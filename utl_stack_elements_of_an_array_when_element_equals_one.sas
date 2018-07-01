@@ -7,7 +7,10 @@ Stack elements of an array when element equals one
       1. %do_over  (have not ported %do_over to WPS)
       2. do over (same result in WPS and SAS)
       3. WPS Proc R ot IML/R  (nice)
-
+      
+ Recent SAS/IML Addition on end
+ by Rick Wicklin via listserv.uga.edu
+     
 github
 https://tinyurl.com/ydymlyyo
 https://github.com/rogerjdeangelis/utl_stack_elements_of_an_array_when_element_equals_one
@@ -183,4 +186,66 @@ run;quit;
 proc print data=wrk.wantwps;
 run;quit;
 ');
+
+Recent SAS/IML Addition on end
+ by Rick Wicklin via listserv.uga.edu
+
+*____  _      _
+|  _ \(_) ___| | __
+| |_) | |/ __| |/ /
+|  _ <| | (__|   <
+|_| \_\_|\___|_|\_\
+
+;
+
+Rick Wicklin via listserv.uga.edu
+6:43 PM (15 hours ago)
+to SAS-L
+It seems like this problem is conceptually similar to the
+"Determining which variable produced the maximum value" problem that
+has been discussed last week. The difference is that here you want
+the variable names strung out in a column instead of concatenated together.
+
+As Roger says, a matrix language can make short work of this problem.
+I wrote about the general idea back in 2012:
+https://blogs.sas.com/content/iml/2012/05/21/find-the-minumum-value-in-each-row.html
+
+For greater understanding, I'll write each step on a separate
+line rather attempt to collapse them into terse nested statements:
+
+data have;
+input A$ S1 S2 S3 S4;
+datalines;
+ex1 1 0 0 0
+ex2 0 1 0 0
+ex3 0 0 1 0
+ex4 1 1 0 0
+ex5 0 1 0 1
+ex6 0 1 0 0
+ex7 1 1 1 0
+ex8 0 1 1 0
+ex9 0 0 1 0
+ex10 1 0 0 0
+;
+
+proc iml;
+use have;
+read all var "A";
+read all var _NUM_ into ss[colname=varName];
+close;
+
+idx = loc(ss=1);                  /* indices where ss = 1 */
+rc = ndx2sub(dimension(ss), idx); /* convert to subscripts (row, col) */
+row = A[rc[,1]];                  /* names of rows */
+TYP = varName[rc[,2]];            /* names of columns */
+print row TYP;
+
+
+Best wishes,
+Rick Wicklin
+
+
+
+
+
 
